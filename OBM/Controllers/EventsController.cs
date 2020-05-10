@@ -767,76 +767,79 @@ namespace OBM.Controllers
                     {
                         string matchRound = "-";
                         matchRound = MatchRound(m, GFinal, LFinal);
-
-                        matchStr += "<table class=\"table table-bordered\" style=\"display: inline-block; border: solid; border-color:black; width:350px\">";
-                        matchStr += "<tr style=\"height:30px\"><td width=\"20%\">";
-                        string player1, player2;
-                        if (m.Competitor1ID != null)
-                            player1 = db.Competitors.Find(m.Competitor1ID).CompetitorName;
-                        else
-                            player1 = "-";
-
-                        if (m.Competitor2ID != null)
-                            player2 = db.Competitors.Find(m.Competitor2ID).CompetitorName;
-                        else
-                            player2 = "-";
-
-                        matchStr += "<button onclick=\"StreamMatch('" + matchRound + "', '" + player1 + "', '" + player2 + "')\">";
-                        matchStr += m.Identifier;
-                        matchStr += "</td><td width=\"55%\">";
-
-                        if (m.Competitor1ID != null)
-                            matchStr += db.Competitors.Find(m.Competitor1ID).CompetitorName;
-                        else
+                        if((m.Competitor1ID != null) || (m.Competitor2ID != null))
                         {
-                            if ((m.Round > 0) || ((m.Round < 0) && (db.Matches.Find(m.PrereqMatch1ID).Round < 0)))
-                                matchStr += "Winner of ";
+                            matchStr += "<table class=\"table table-bordered\" style=\"display: inline-block; border: solid; border-color:black; width:350px\">";
+                            matchStr += "<tr style=\"height:30px\"><td width=\"20%\">";
+                            string player1, player2;
+                            if (m.Competitor1ID != null)
+                                player1 = db.Competitors.Find(m.Competitor1ID).CompetitorName;
                             else
-                                matchStr += "Loser of ";
-                            matchStr += db.Matches.Find(m.PrereqMatch1ID).Identifier;
-                        }
+                                player1 = "-";
 
-                        matchStr += "</button></td><td width=\"25%\">";
-
-
-
-
-                        if (m.Score1 == null)
-                            matchStr += "<button id=" + m.ApiID + "\" style=\"width: 100 % \" onclick=StartMatch(" + JsonConvert.SerializeObject(m) + ") >Start</button>";
-                        else
-                        {
-                            //location.href='<%: Url.Action("Action", "Controller") %>'
-                        }
-                        matchStr += m.Score1;
-                        matchStr += "</td></tr>";
-
-
-
-
-                        matchStr += "<tr><td>";
-                        matchStr += matchRound;
-                        matchStr += "</td><td>";
-
-                        if (m.Competitor2ID != null)
-                            matchStr += db.Competitors.Find(m.Competitor2ID).CompetitorName;
-                        else
-                        {
-                            if ((m.Round > 0) || ((m.Round < 0) && (db.Matches.Find(m.PrereqMatch2ID).Round < 0)))
-                                matchStr += "Winner of ";
+                            if (m.Competitor2ID != null)
+                                player2 = db.Competitors.Find(m.Competitor2ID).CompetitorName;
                             else
-                                matchStr += "Loser of ";
-                            matchStr += db.Matches.Find(m.PrereqMatch2ID).Identifier;
+                                player2 = "-";
+
+                            matchStr += "<button onclick=\"StreamMatch('" + matchRound + "', '" + player1 + "', '" + player2 + "')\">";
+                            matchStr += m.Identifier;
+                            matchStr += "</td><td width=\"55%\">";
+
+                            if (m.Competitor1ID != null)
+                                matchStr += db.Competitors.Find(m.Competitor1ID).CompetitorName;
+                            else
+                            {
+                                if ((m.Round > 0) || ((m.Round < 0) && (db.Matches.Find(m.PrereqMatch1ID).Round < 0)))
+                                    matchStr += "Winner of ";
+                                else
+                                    matchStr += "Loser of ";
+                                matchStr += db.Matches.Find(m.PrereqMatch1ID).Identifier;
+                            }
+
+                            matchStr += "</button></td><td width=\"25%\">";
+
+
+
+
+                            if (m.Score1 == null)
+                                matchStr += "<button id=" + m.ApiID + "\" style=\"width: 100 % \" onclick=StartMatch(" + JsonConvert.SerializeObject(m) + ") >Start</button>";
+                            else
+                            {
+                                //location.href='<%: Url.Action("Action", "Controller") %>'
+                            }
+                            matchStr += m.Score1;
+                            matchStr += "</td></tr>";
+
+
+
+
+                            matchStr += "<tr><td>";
+                            matchStr += matchRound;
+                            matchStr += "</td><td>";
+
+                            if (m.Competitor2ID != null)
+                                matchStr += db.Competitors.Find(m.Competitor2ID).CompetitorName;
+                            else
+                            {
+                                if ((m.Round > 0) || ((m.Round < 0) && (db.Matches.Find(m.PrereqMatch2ID).Round < 0)))
+                                    matchStr += "Winner of ";
+                                else
+                                    matchStr += "Loser of ";
+                                matchStr += db.Matches.Find(m.PrereqMatch2ID).Identifier;
+                            }
+
+                            matchStr += "</td><td>";
+
+                            if (m.Score2 == null)
+                                matchStr += "<button id=sub" + m.ApiID + "\" style=\"width: 100 % \" onclick=SubmitScore(" + JsonConvert.SerializeObject(m) + ")>Submit</button>";
+                            else
+                                matchStr += m.Score2;
+                            matchStr += "</td></tr></table>";
                         }
-
-                        matchStr += "</td><td>";
-
-                        if (m.Score2 == null)
-                            matchStr += "<button id=sub" + m.ApiID + "\" style=\"width: 100 % \" onclick=SubmitScore(" + JsonConvert.SerializeObject(m) + ")>Submit</button>";
-                        else
-                            matchStr += m.Score2;
-                        matchStr += "</td></tr></table>";
                         matchStr += "<div style = \"display: inline-block; width: 5px\"></div>";
                     }
+                    matchStr += "</br><a href=\"/Tournaments/HiddenMatches/" + t.TournamentID + "\">Unnavailable and Complete Matches</a>";
                     matchStr += "</div></div></br>";
                 }
             }
