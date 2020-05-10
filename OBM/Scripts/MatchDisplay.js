@@ -1,21 +1,23 @@
-﻿function sharedFunction(id) {
-    console.log("hello " + id);
-    var state = $('#busyState' + id).val();
+﻿var token = $('[name=__RequestVerificationToken]').val();
+
+function sharedFunction(id) {
+    var state = $('#busyState-' + id).val();
 
     if (state == "b") {
-        $("#busyState").toggleClass("btn-outline-danger btn-outline-success");
-        $("#busyState").val("a");
-        $("#busyState").text("a");
+        $("#busyState-" + id).toggleClass("btn-outline-danger btn-outline-success");
+        $("#busyState-" + id).val("a");
+        $("#busyState-" + id).text("a");
     }
     else {
-        $("#busyState").toggleClass("btn-outline-success btn-outline-danger");
-        $("#busyState").val("b");
-        $("#busyState").text("b");
+        $("#busyState-" + id).toggleClass("btn-outline-success btn-outline-danger");
+        $("#busyState-" + id).val("b");
+        $("#busyState-" + id).text("b");
     }
 
     $.ajax({
         type: 'POST',
         url: '/Events/Competitor/' + id,
+        data: { __RequestVerificationToken: token },
         success: ajax_match,
         error: errorOnAjax
     });
@@ -66,6 +68,7 @@ function StartTournament(id)
         type: 'POST',
         dataType: 'json',
         url: '/Events/StartTournament?id=' + id,
+        data: { __RequestVerificationToken: token },
         success: console.log("it even went good"),
         complete: console.log("TOURNAMENT START COMPLETED"),
         error: errorOnAjax
@@ -151,8 +154,28 @@ function StreamMatch(round, player1, player2) {
     updateAll();
 }
 
+
+function ResetMatch(mymatch) {
+    console.log(mymatch);
+    //if (mymatch["PrereqMatch1ID"] == null && mymatch["PrereqMatch1ID"] == null) {
+    //MAKE REQUEST TO START MATCH
+
+    $.ajax({
+        type: 'POST',
+        url: '/Events/ResetMatch/',
+        data: (mymatch),
+        success: ajax_call,
+        error: errorOnAjax
+    });
+
+    alert("Match Reset");
+}
+
+
+
 function StartMatch(mymatch)
 {
+    mymatch.__RequestVerificationToken = token;
     console.log(mymatch);
     //if (mymatch["PrereqMatch1ID"] == null && mymatch["PrereqMatch1ID"] == null) {
         //MAKE REQUEST TO START MATCH
@@ -160,8 +183,8 @@ function StartMatch(mymatch)
         $.ajax({
             type: 'POST',
             url: '/Events/StartMatch/',
-            data: (mymatch),
-            success: ajax_call ,
+            data: mymatch,
+            success: ajax_call,
             error: errorOnAjax
         });
     
@@ -196,9 +219,6 @@ function SubmitScore(mymatch)
         alert("Please Enter a number for each score.");
 }
 
-
-
-
 function ValidateScore(score)
 {
     if (score.isInteger)
@@ -209,6 +229,7 @@ function ValidateScore(score)
 
 function PostScore(mymatch)
 {
+    mymatch.__RequestVerificationToken = token;
     $.ajax({
         type: 'POST',
         url: '/Events/SubmitScore/',
