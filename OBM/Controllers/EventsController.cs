@@ -64,6 +64,27 @@ namespace OBM.Controllers
             return View(eventView);
         }
 
+        public ActionResult HiddenMatches(int? id)
+        {
+            if (id == null)
+            {
+                throw new HttpException(400, "Bad Request");
+            }
+            var eventView = new EventViewModel(db.Events.Find(db.Tournaments.Find(id).EventID), HttpContext.GetOwinContext().Get<ApplicationUserManager>().FindById(db.Events.Find(db.Tournaments.Find(id).EventID).OrganizerID).UserName);
+            if (eventView == null)
+            {
+                throw new HttpException(404, "Page not Found");
+            }
+            if ((Request.IsAuthenticated && (User.Identity.GetUserId() == eventView.OrganizerID)))
+            {
+                ViewBag.Access = true;
+            }
+            else
+                ViewBag.Access = false;
+            ViewBag.TournamentID = id;
+            return View(eventView);
+        }
+
         [HttpGet]
         public String PublicEvents()
         {
@@ -793,13 +814,12 @@ namespace OBM.Controllers
                             matchStr += "</button></td><td width=\"25%\">";
 
                             if (m.Score1 == null)
-                                matchStr += "<button id=" + m.ApiID + "\" style=\"width: 100 % \" onclick=StartMatch(" + JsonConvert.SerializeObject(m) + ") >Start</button>";
+                                matchStr += "";
                             else
                             {
                                 matchStr += "<button id=" + m.ApiID + "\" style=\"width: 100 % \" onclick=ResetMatch(" + JsonConvert.SerializeObject(m) + ") >Reset</button>";
 
                             }
-                            matchStr += m.Score1;
                             matchStr += "</td></tr>";
 
 
@@ -828,7 +848,7 @@ namespace OBM.Controllers
                         }
                         matchStr += "<div style = \"display: inline-block; width: 5px\"></div>";
                     }
-                    matchStr += "</br><a href=\"/Tournaments/HiddenMatches/" + t.TournamentID + "\">Unnavailable and Complete Matches</a>";
+                    matchStr += "</br><a href=\"/Events/HiddenMatches/" + t.TournamentID + "\">Unnavailable and Complete Matches</a>";
                     matchStr += "</div></div></br>";
                 }
             }
@@ -844,7 +864,8 @@ namespace OBM.Controllers
         public JsonResult HiddenList(int? id)
         {
             var matchList = db.Matches.Where(x => x.TournamentID == id).ToList();
-            var matchStr = "<div class =\"card\" style = \"background-color:lightgrey\"> <h5 align=\"left\"><a href=\"/Events/Tournament/" + t.TournamentID + "\">" + t.TournamentName + "</a></h5>" + startButton + "<div>";
+            var matchStr = "";
+            matchStr += "<div class =\"card\" style = \"background-color:lightgrey\"> <h5 align=\"left\"><a href=\"/Events/Tournament/" + id + "\">" + db.Tournaments.Find(id).TournamentName + "</a></h5><div>";
             if (matchList.Any())
             {
                 var GFinal = (int)matchList.MaxBy(x => x.Round).First().Round;
@@ -854,7 +875,7 @@ namespace OBM.Controllers
                 {
                     string matchRound = "-";
                     matchRound = MatchRound(m, GFinal, LFinal);
-                    if (((m.Competitor1ID != null) || (m.Competitor2ID != null)) && (m.Score1 == null))
+                    if (!(((m.Competitor1ID != null) || (m.Competitor2ID != null)) && (m.Score1 == null)))
                     {
                         matchStr += "<table class=\"table table-bordered\" style=\"display: inline-block; border: solid; border-color:black; width:350px\">";
                         matchStr += "<tr style=\"height:30px\"><td width=\"20%\">";
@@ -869,7 +890,6 @@ namespace OBM.Controllers
                         else
                             player2 = "-";
 
-                        matchStr += "<button onclick=\"StreamMatch('" + matchRound + "', '" + player1 + "', '" + player2 + "')\">";
                         matchStr += m.Identifier;
                         matchStr += "</td><td width=\"55%\">";
 
@@ -887,13 +907,12 @@ namespace OBM.Controllers
                         matchStr += "</button></td><td width=\"25%\">";
 
                         if (m.Score1 == null)
-                            matchStr += "<button id=" + m.ApiID + "\" style=\"width: 100 % \" onclick=StartMatch(" + JsonConvert.SerializeObject(m) + ") >Start</button>";
+                            matchStr += "";
                         else
                         {
                             matchStr += "<button id=" + m.ApiID + "\" style=\"width: 100 % \" onclick=ResetMatch(" + JsonConvert.SerializeObject(m) + ") >Reset</button>";
 
                         }
-                        matchStr += m.Score1;
                         matchStr += "</td></tr>";
 
 
@@ -915,14 +934,13 @@ namespace OBM.Controllers
                         matchStr += "</td><td>";
 
                         if (m.Score2 == null)
-                            matchStr += "<button id=sub" + m.ApiID + "\" style=\"width: 100 % \" onclick=SubmitScore(" + JsonConvert.SerializeObject(m) + ")>Submit</button>";
+                            matchStr += "";
                         else
                             matchStr += m.Score1 + "-" + m.Score2;
                         matchStr += "</td></tr></table>";
                     }
                     matchStr += "<div style = \"display: inline-block; width: 5px\"></div>";
                 }
-                matchStr += "</br><a href=\"/Tournaments/HiddenMatches/" + t.TournamentID + "\">Unnavailable and Complete Matches</a>";
                 matchStr += "</div></div></br>";
             }
 

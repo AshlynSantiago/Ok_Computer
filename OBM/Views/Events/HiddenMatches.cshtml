@@ -1,0 +1,14 @@
+﻿@model OBM.Models.ViewModels.EventViewModel
+
+
+@{
+    ViewBag.Title = "Unnavailable/Complete Matches";
+    <h2>@Html.DisplayFor(model => model.EventName)</h2>
+    <input type="hidden" id="tournamentID" name="tournamentID" value="@ViewBag.TournamentID" />
+    <div id="Matches">
+        @Html.AntiForgeryToken();
+    </div>
+}
+
+<script type="text/javascript" src="~/Scripts/HiddenDisplay.js"></script>
+
