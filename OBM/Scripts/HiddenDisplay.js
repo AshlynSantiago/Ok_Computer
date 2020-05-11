@@ -1,6 +1,6 @@
 ﻿var interval = 1000 * 5;
 
-var ajax_call = function () {
+var ajax_match = function () {
     var tournamentID = $('#tournamentID').val();
     //console.log(eventID);
     $.ajax({
@@ -8,7 +8,18 @@ var ajax_call = function () {
         dataType: 'json',
         url: '/Events/HiddenList?id=' + tournamentID,
         success: MatchList,
-        complete: setTimeout(ajax_call, interval),
+        complete: setTimeout(ajax_match_update, interval),
+        error: errorOnAjax
+    });
+}
+
+var ajax_match_update = function () {
+    var eventID = $("#eventID").val();
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: '/Events/MatchUpdate?id=' + eventID,
+        complete: setTimeout(ajax_match, 0),
         error: errorOnAjax
     });
 }
@@ -38,4 +49,4 @@ function errorOnAjax() {
     console.log("ERROR in ajax request.");
 }
 
-window.setTimeout(ajax_call, 0);
+window.setTimeout(ajax_match_update, 0);

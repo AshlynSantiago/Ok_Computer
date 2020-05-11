@@ -814,7 +814,7 @@ namespace OBM.Controllers
                             matchStr += "</button></td><td width=\"25%\">";
 
                             if (m.Score1 == null)
-                                matchStr += "";
+                                matchStr += "<button id=" + m.ApiID + "\" style=\"width: 100 % \" onclick=StartMatch(" + JsonConvert.SerializeObject(m) + ") >Start</button>";
                             else
                             {
                                 matchStr += "<button id=" + m.ApiID + "\" style=\"width: 100 % \" onclick=ResetMatch(" + JsonConvert.SerializeObject(m) + ") >Reset</button>";
